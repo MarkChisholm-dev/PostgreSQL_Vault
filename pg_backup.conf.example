@@ -39,7 +39,6 @@ PGSERVICE=""
 # Optional additional pg_dump options.
 PG_DUMP_OPTS=(
   "--format=plain"
-  "--single-transaction"
   "--no-owner"
   "--no-privileges"
   "--encoding=UTF8"

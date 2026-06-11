@@ -64,7 +64,6 @@ PGSERVICE=""
 # Additional pg_dump options tuned for consistent, portable logical backups.
 PG_DUMP_OPTS=(
   "--format=plain"
-  "--single-transaction"
   "--no-owner"
   "--no-privileges"
   "--encoding=UTF8"
