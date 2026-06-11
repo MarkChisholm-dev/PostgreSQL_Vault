@@ -14,7 +14,7 @@ CONFIG_FILE_PATH="$WORK_DIR/pg_backup.conf"
 
 mkdir -p "$BACKUP_DIR" "$LOG_DIR"
 
-cat >"$CONFIG_FILE_PATH" <<EOF
+cat > "$CONFIG_FILE_PATH" << EOF
 BACKUP_DIR="$BACKUP_DIR"
 LOG_DIR="$LOG_DIR"
 LOG_FILE="${LOG_DIR}/postgresql_backup.log"
