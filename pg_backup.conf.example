@@ -1,0 +1,82 @@
+# PostgreSQL backup external configuration template
+# Copy to /etc/postgresql/pg_backup.conf and adjust ownership/permissions:
+#   sudo install -o root -g root -m 600 pg_backup.conf.example /etc/postgresql/pg_backup.conf
+#
+# IMPORTANT:
+# - Do not store plaintext passwords here.
+# - Use .pgpass, PGSERVICE, or managed environment variables.
+
+###############################################################################
+# Storage and retention
+###############################################################################
+
+BACKUP_DIR="/var/backups/postgresql"
+LOG_DIR="/var/log/postgresql-backup"
+LOG_FILE="${LOG_DIR}/postgresql_backup.log"
+LOCK_FILE="/var/lock/postgresql_backup.lock"
+BACKUP_RETENTION_DAYS=14
+
+###############################################################################
+# Database targets
+###############################################################################
+
+DATABASES=(
+  "postgres"
+  "appdb"
+)
+
+###############################################################################
+# PostgreSQL connectivity
+###############################################################################
+
+PGHOST="localhost"
+PGPORT="5432"
+PGUSER="postgres"
+PGDATABASE=""
+# Preferred for service-based authentication if configured.
+PGSERVICE=""
+
+# Optional additional pg_dump options.
+PG_DUMP_OPTS=(
+  "--format=plain"
+  "--single-transaction"
+  "--no-owner"
+  "--no-privileges"
+  "--encoding=UTF8"
+)
+
+###############################################################################
+# Optional checksum settings
+###############################################################################
+
+ENABLE_CHECKSUMS=true
+SHA256SUM_BIN="sha256sum"
+
+###############################################################################
+# Optional encryption settings
+# ENCRYPTION_MODE supports: none, age, gpg
+###############################################################################
+
+ENCRYPTION_MODE="none"
+
+# AGE settings
+AGE_BIN="age"
+AGE_RECIPIENTS=(
+  # "age1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+)
+
+# GPG settings
+GPG_BIN="gpg"
+GPG_RECIPIENTS=(
+  # "backup@example.com"
+)
+GPG_OPTS=("--batch" "--yes" "--trust-model" "always")
+
+###############################################################################
+# Tool command overrides (optional)
+###############################################################################
+
+PG_DUMP_BIN="pg_dump"
+GZIP_BIN="gzip"
+FIND_BIN="find"
+FLOCK_BIN="flock"
