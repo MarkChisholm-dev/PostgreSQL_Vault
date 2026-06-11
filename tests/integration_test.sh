@@ -38,7 +38,15 @@ EOF
 export CONFIG_FILE="$CONFIG_FILE_PATH"
 export PGPASSWORD="postgres"
 
-bash "$ROOT_DIR/script.sh"
+if ! bash "$ROOT_DIR/script.sh"; then
+  echo "Backup script failed; dumping log for diagnostics:"
+  if [[ -f "$LOG_DIR/postgresql_backup.log" ]]; then
+    cat "$LOG_DIR/postgresql_backup.log"
+  else
+    echo "Log file not found at $LOG_DIR/postgresql_backup.log"
+  fi
+  exit 1
+fi
 
 backup_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name '*.sql.gz' | wc -l | tr -d ' ')"
 checksum_count="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name '*.sha256' | wc -l | tr -d ' ')"

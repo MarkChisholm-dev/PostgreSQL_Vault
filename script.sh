@@ -257,29 +257,6 @@ backup_database() {
       return 1
     fi
 
-    if [[ "$ENABLE_CHECKSUMS" == "true" ]]; then
-      current_checksum_file="${output_file}.sha256"
-      if ! "$SHA256SUM_BIN" "$output_file" > "$current_checksum_file" 2>> "$LOG_FILE"; then
-        log_msg "$db_name" "FAILURE" "Failed to generate checksum: $current_checksum_file"
-        cleanup_partial_backup
-        current_backup_file=""
-        current_checksum_file=""
-        current_encrypted_file=""
-        current_db=""
-        return 1
-      fi
-
-      if ! "$SHA256SUM_BIN" --check --status "$current_checksum_file" 2>> "$LOG_FILE"; then
-        log_msg "$db_name" "FAILURE" "Checksum verification failed for: $output_file"
-        cleanup_partial_backup
-        current_backup_file=""
-        current_checksum_file=""
-        current_encrypted_file=""
-        current_db=""
-        return 1
-      fi
-    fi
-
     case "$ENCRYPTION_MODE" in
       none) ;;
       age)
@@ -345,6 +322,29 @@ backup_database() {
         final_file="$current_encrypted_file"
         ;;
     esac
+
+    if [[ "$ENABLE_CHECKSUMS" == "true" ]]; then
+      current_checksum_file="${final_file}.sha256"
+      if ! "$SHA256SUM_BIN" "$final_file" > "$current_checksum_file" 2>> "$LOG_FILE"; then
+        log_msg "$db_name" "FAILURE" "Failed to generate checksum: $current_checksum_file"
+        cleanup_partial_backup
+        current_backup_file=""
+        current_checksum_file=""
+        current_encrypted_file=""
+        current_db=""
+        return 1
+      fi
+
+      if ! "$SHA256SUM_BIN" --check --status "$current_checksum_file" 2>> "$LOG_FILE"; then
+        log_msg "$db_name" "FAILURE" "Checksum verification failed for: $final_file"
+        cleanup_partial_backup
+        current_backup_file=""
+        current_checksum_file=""
+        current_encrypted_file=""
+        current_db=""
+        return 1
+      fi
+    fi
 
     log_msg "$db_name" "SUCCESS" "Backup completed: $final_file"
     current_backup_file=""
