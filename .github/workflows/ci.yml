@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint-and-validate:
+    name: Lint and Validate Bash
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck shfmt
+
+      - name: Bash syntax check
+        run: bash -n script.sh tests/integration_test.sh
+
+      - name: ShellCheck
+        run: shellcheck script.sh tests/integration_test.sh
+
+      - name: shfmt check
+        run: shfmt -d -i 2 -ci -sr script.sh tests/integration_test.sh pg_backup.conf.example
+
+  integration:
+    name: Integration Test (PostgreSQL)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Wait for PostgreSQL
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for i in {1..30}; do
+            if pg_isready -h 127.0.0.1 -p 5432 -U postgres; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "PostgreSQL did not become ready in time"
+          exit 1
+
+      - name: Run integration test
+        run: bash tests/integration_test.sh

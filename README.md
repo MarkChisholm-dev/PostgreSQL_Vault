@@ -6,6 +6,7 @@ Reliable, secure, and automation-ready PostgreSQL logical backups for Linux.
 ![Platform](https://img.shields.io/badge/Platform-Linux-2f855a?style=for-the-badge&logo=linux&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-pg_dump-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Security](https://img.shields.io/badge/Security-Checksums%20%2B%20Optional%20Encryption-0f766e?style=for-the-badge)
+[![CI](https://github.com/MarkChisholm-dev/PostgreSQL_Vault/actions/workflows/ci.yml/badge.svg)](https://github.com/MarkChisholm-dev/PostgreSQL_Vault/actions/workflows/ci.yml)
 
 ---
 
@@ -59,6 +60,23 @@ flowchart TD
 	M --> N[Prune old backups]
 	N --> O[Finish job]
 ```
+
+---
+
+## Continuous Integration
+
+GitHub Actions runs on every push to `main` and every pull request.
+
+Pipeline coverage:
+
+- Bash syntax validation (`bash -n`)
+- Static analysis (`shellcheck`)
+- Format enforcement (`shfmt -d`)
+- Integration test against PostgreSQL 16 service container
+
+Workflow file:
+
+- `.github/workflows/ci.yml`
 
 ---
 
